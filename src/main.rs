@@ -22,7 +22,7 @@ enum SearchType {
 }
 
 fn main() {
-    let my_instance = tram::TransportationProblem::new(100);
+    let my_instance = tram::TransportationProblem::new(17);
     let mut path: Path;
     let mut cost: Cost;
 
@@ -38,7 +38,11 @@ fn main() {
         path, cost
     );
 
-    // (path, cost) = generic_blind_search(&my_instance, SearchType::UCS);
+    (path, cost) = generic_blind_search(&my_instance, SearchType::UCS);
+    println!(
+        "The path found by Uniform Cost Search is {:?}, with time cost {}",
+        path, cost
+    );
 }
 
 /// Generic blind search:
@@ -86,6 +90,12 @@ fn que_action(
             Some(x) => x,
             None => panic!("Unreachable destination!"),
         },
-        SearchType::UCS => panic!("Unimplemented search!"),
+        SearchType::UCS => {
+            que.make_contiguous().sort_by_key(|tuple| tuple.1);
+            match que.pop_front() {
+                Some(x) => x,
+                None => panic!("Unreachable destination!"),
+            }
+        }
     }
 }

@@ -32,11 +32,12 @@ impl TransportationProblem {
 
     pub fn next_act_cost(&self, state: Address) -> Vec<(Action, Address, Cost)> {
         let mut ans = Vec::new();
-        if state + 1 <= self.dest {
-            ans.push((Action::Walk, state + 1, 1));
-        }
+
         if state * 2 <= self.dest {
             ans.push((Action::Tram, state * 2, 2));
+        }
+        if state + 1 <= self.dest {
+            ans.push((Action::Walk, state + 1, 1));
         }
         ans
     }
