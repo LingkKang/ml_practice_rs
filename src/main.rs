@@ -10,13 +10,13 @@ fn main() {
     let my_instance = tram::TransportationProblem::new(100);
     let path: Path;
     let cost: Cost;
-    (path, cost) = breadth_first_search(my_instance);
+    (path, cost) = breadth_first_search(&my_instance);
     println!("Find pash is {:?}", path);
     println!("With time cost {:?}", cost);
 }
 
 /// implement breadth first search for tram problem
-fn breadth_first_search(problem: tram::TransportationProblem) -> (Path, Cost) {
+fn breadth_first_search(problem: &tram::TransportationProblem) -> (Path, Cost) {
     let mut que: VecDeque<(Address, Cost, Path)> = VecDeque::new();
     que.push_back((problem.start(), 0, Vec::new()));
 
