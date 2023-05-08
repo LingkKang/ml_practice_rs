@@ -6,17 +6,47 @@ type Path = Vec<tram::Action>;
 type Address = u64;
 type Cost = u64;
 
-fn main() {
-    let my_instance = tram::TransportationProblem::new(100);
-    let path: Path;
-    let cost: Cost;
-    (path, cost) = breadth_first_search(&my_instance);
-    println!("Find pash is {:?}", path);
-    println!("With time cost {:?}", cost);
+/// different types of blind search:
+/// - `BFS`: Breadth First Search
+/// - `DFS`: Depth First Search
+/// - `UCS`: Uniform Cost Search
+enum SearchType {
+    /// Breadth First Search
+    BFS,
+
+    /// Depth First Search
+    DFS,
+
+    /// Uniform Cost Search
+    UCS,
 }
 
-/// implement breadth first search for tram problem
-fn breadth_first_search(problem: &tram::TransportationProblem) -> (Path, Cost) {
+fn main() {
+    let my_instance = tram::TransportationProblem::new(100);
+    let mut path: Path;
+    let mut cost: Cost;
+
+    (path, cost) = generic_blind_search(&my_instance, SearchType::BFS);
+    println!(
+        "The path found by Breadth First Search is {:?}, with time cost {}",
+        path, cost
+    );
+
+    (path, cost) = generic_blind_search(&my_instance, SearchType::DFS);
+    println!(
+        "The path found by Depth First Search is {:?}, with time cost {}",
+        path, cost
+    );
+
+    // (path, cost) = generic_blind_search(&my_instance, SearchType::UCS);
+}
+
+/// Generic blind search:
+/// with different given `search_type`, perform different search
+fn generic_blind_search(
+    problem: &tram::TransportationProblem,
+    search_type: SearchType,
+) -> (Path, Cost) {
     let mut que: VecDeque<(Address, Cost, Path)> = VecDeque::new();
     que.push_back((problem.start(), 0, Vec::new()));
 
@@ -27,13 +57,8 @@ fn breadth_first_search(problem: &tram::TransportationProblem) -> (Path, Cost) {
     let mut path: Path;
 
     loop {
-        let item = que.pop_front();
-        match item {
-            Some(x) => (new_state, history_cost, path) = x,
-            None => {
-                panic!("Unreachable destination!");
-            }
-        }
+        let item = que_action(&mut que, &search_type);
+        (new_state, history_cost, path) = item;
         if problem.is_end(new_state) {
             return (path, history_cost);
         }
@@ -43,5 +68,24 @@ fn breadth_first_search(problem: &tram::TransportationProblem) -> (Path, Cost) {
             new_path.push(action);
             que.push_back((new_state, history_cost + cost, new_path));
         }
+    }
+}
+
+/// The major difference between blind search algorithms are
+/// the difference of the order of new node exploring
+fn que_action(
+    que: &mut VecDeque<(Address, Cost, Path)>,
+    search_type: &SearchType,
+) -> (Address, Cost, Path) {
+    match search_type {
+        SearchType::BFS => match que.pop_front() {
+            Some(x) => x,
+            None => panic!("Unreachable destination!"),
+        },
+        SearchType::DFS => match que.pop_back() {
+            Some(x) => x,
+            None => panic!("Unreachable destination!"),
+        },
+        SearchType::UCS => panic!("Unimplemented search!"),
     }
 }
