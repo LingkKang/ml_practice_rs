@@ -1,7 +1,10 @@
 mod blind_search;
 
 fn main() {
-    // let my_instance = tram::TransportationProblem::new(17);
+    search_tram_blind();
+}
+
+fn search_tram_blind() {
     let my_instance = blind_search::TramProblem::new(17);
     let mut path: blind_search::Path;
     let mut cost: blind_search::Cost;
